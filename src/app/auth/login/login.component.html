@@ -39,7 +39,9 @@
                   </div>
                 </div>
                 <div class="form-group">
-                  <button class="btn btn-primary submit-btn btn-block" [disabled]="!form.valid">Login</button>
+                  <button  *ngIf="!cargando" [disabled]="!cargando" class="btn btn-primary submit-btn btn-block" [disabled]="!form.valid">Login</button>
+                  <button *ngIf="cargando" [disabled]="true" class="btn btn-primary submit-btn btn-block" [disabled]="!form.valid">
+                      <i class="fa fa-spin fa-sync"></i>Espere ...</button>
                 </div>
                 
                 
