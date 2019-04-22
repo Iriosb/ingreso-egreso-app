@@ -11,7 +11,7 @@ import { User } from './user.model';
 import { AppState } from '../app.reducer';
 import { ActivarLoadingAction, DesactivarLoadingAction } from '../shared/ui.actions';
 import { Observable, Subscription } from 'rxjs';
-import { SetUserAction } from './auth.actions';
+import { SetUserAction, UnsetUserAction } from './auth.actions';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +20,7 @@ export class AuthService {
 
   usersCollection: AngularFirestoreCollection<User>;
   items: Observable<User[]>;
+  usuario: User;
 
   private userSubscription: Subscription = new Subscription();
 
@@ -33,11 +34,12 @@ export class AuthService {
       if(fbUser) {
         this.userSubscription = this.afDB.doc<User>(`usuarios/${ fbUser.uid}`).valueChanges()
         .subscribe(usuarioObj => {
-          
           const newUser = new User(usuarioObj);
           this.store.dispatch(new SetUserAction(newUser));
+          this.usuario = newUser;
         });
       } else {
+        this.usuario = null;
         this.userSubscription.unsubscribe();
       }
     });
@@ -93,6 +95,8 @@ export class AuthService {
   logout() {
     this.router.navigate(['/login']);
     this.afAuth.auth.signOut();
+
+    this.store.dispatch(new UnsetUserAction());
   }
 
   isAuth() {
@@ -104,5 +108,10 @@ export class AuthService {
         return fbUser != null 
       })
     );
+  }
+
+  
+  getUsuario() {
+    return {...this.usuario}
   }
 }
